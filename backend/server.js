@@ -1,10 +1,19 @@
 import express from "express";
 import bodyParser from "body-parser";
+
 import placesRoutes from "./routes/places-routes.js";
+import { HttpError } from "./models/http-error.js";
 
 const app = express();
 
+app.use(bodyParser.json());
+
 app.use("/api/places", placesRoutes);
+
+// error handling  for routes
+app.use((req, res, next) => {
+  next(new HttpError("Could not find this route.", 404));
+});
 
 // error handling
 app.use((error, req, res, next) => {

@@ -1,4 +1,5 @@
 import { HttpError } from "../models/http-error.js";
+import { v4 as generateUniqueId } from "uuid";
 
 const DUMMY_PLACES = [
   {
@@ -44,4 +45,20 @@ export const getPlaceByUserId = (req, res, next) => {
   }
 
   res.json({ place });
+};
+
+export const createPlace = (req, res, next) => {
+  const { title, description, coordinates, address, creatorId } = req.body;
+
+  const newPlace = {
+    id: generateUniqueId(),
+    title,
+    description,
+    location: coordinates,
+    address,
+    creatorId,
+  };
+
+  DUMMY_PLACES.push(newPlace);
+  res.status(201).json({ place: newPlace });
 };
