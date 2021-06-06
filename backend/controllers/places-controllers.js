@@ -1,8 +1,8 @@
-import { HttpError } from "../models/http-error.js";
-import { v4 as generateUniqueId } from "uuid";
 import { validationResult } from "express-validator";
 
+import { HttpError } from "../models/http-error.js";
 import { getCoordinatesForAddress } from "../utils/location.js";
+import Place from "../models/place.js";
 
 let DUMMY_PLACES = [
   {
@@ -68,16 +68,21 @@ export const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const newPlace = {
-    id: generateUniqueId(),
+  const newPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image: "some http link image",
     creatorId,
-  };
+  });
 
-  DUMMY_PLACES.push(newPlace);
+  try {
+    await newPlace.save();
+  } catch (err) {
+    return next(new HttpError("Creating place failed, please try again.", 500));
+  }
+
   res.status(201).json({ place: newPlace });
 };
 
