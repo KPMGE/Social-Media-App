@@ -1,5 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
 import placesRoutes from "./routes/places-routes.js";
 import usersRoutes from "./routes/users-routes.js";
@@ -7,6 +9,7 @@ import { HttpError } from "./models/http-error.js";
 
 const app = express();
 
+dotenv.config();
 app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
@@ -27,6 +30,15 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-app.listen(5000, () => {
-  console.log("Listening on port 5000");
-});
+const uri = process.env.DB_URI;
+const port = process.env.SERVER_PORT || 3000;
+
+mongoose
+  .connect(uri, { useNewUrlParser: true })
+  .then(() => {
+    app.listen(port, () => {
+      console.log("Connected to the database!");
+      console.log(`Listening on port ${port}`);
+    });
+  })
+  .catch((err) => console.error(err));
