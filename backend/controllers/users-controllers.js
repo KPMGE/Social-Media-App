@@ -1,5 +1,6 @@
-import { HttpError } from "../models/http-error.js";
 import { validationResult } from "express-validator";
+
+import { HttpError } from "../models/http-error.js";
 import User from "../models/user.js";
 
 export const getAllUsers = async (req, res, next) => {
@@ -28,7 +29,7 @@ export const signup = async (req, res, next) => {
     return next(error);
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -54,10 +55,9 @@ export const signup = async (req, res, next) => {
     email,
     password,
     image: "Some url image here",
-    places,
+    places: [],
   });
 
-  console.log(newUser);
   try {
     await newUser.save();
   } catch (err) {
