@@ -54,7 +54,7 @@ export const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image: "Some url image here",
+    image: "https://avatars.githubusercontent.com/u/46900633?v=4",
     places: [],
   });
 
