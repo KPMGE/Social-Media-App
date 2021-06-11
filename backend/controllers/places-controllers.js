@@ -80,7 +80,7 @@ export const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image: "some http link image",
+    image: "https://diariodorio.com/wp-content/uploads/2020/06/8317cristo-redentor-foto-de-Rog%C3%A9rio-Santana-scaled.jpg",
     creatorId,
   });
 
