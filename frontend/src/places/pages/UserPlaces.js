@@ -11,7 +11,6 @@ const UserPlaces = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const userId = useParams().userId;
-  console.log(userId);
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -27,6 +26,12 @@ const UserPlaces = () => {
     fetchPlaces();
   }, [sendRequest, userId]);
 
+  const placeDeleteHandler = (deletedPlaceId) => {
+    setLoadedPlaces((previousPlaces) => {
+      previousPlaces.filter((place) => place.id !== deletedPlaceId);
+    });
+  };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -37,7 +42,9 @@ const UserPlaces = () => {
         </div>
       )}
 
-      {!isLoading && loadedPlaces && <PlaceList items={loadedPlaces} />}
+      {!isLoading && loadedPlaces && (
+        <PlaceList items={loadedPlaces} onDeletePlace={placeDeleteHandler} />
+      )}
     </React.Fragment>
   );
 };
