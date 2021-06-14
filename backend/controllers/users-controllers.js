@@ -54,7 +54,7 @@ export const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image: "https://avatars.githubusercontent.com/u/46900633?v=4",
+    image: req.file.path,
     places: [],
   });
 
@@ -65,7 +65,7 @@ export const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ user: newUser.toObject({ getters: true }) });
+  res.status(201).json({ user: newUser.toObject({ getters: true }) });
 };
 
 export const login = async (req, res, next) => {

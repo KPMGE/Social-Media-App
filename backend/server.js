@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -11,6 +14,8 @@ const app = express();
 
 dotenv.config();
 app.use(bodyParser.json());
+
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 // removing CORS errors
 app.use((req, res, next) => {
@@ -34,6 +39,12 @@ app.use((req, res, next) => {
 
 // error handling
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }

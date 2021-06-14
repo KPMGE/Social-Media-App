@@ -1,3 +1,5 @@
+import  {unlink} from 'fs';
+
 import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 
@@ -80,7 +82,7 @@ export const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image: "https://diariodorio.com/wp-content/uploads/2020/06/8317cristo-redentor-foto-de-Rog%C3%A9rio-Santana-scaled.jpg",
+    image: req.file.path,
     creatorId,
   });
 
@@ -182,6 +184,8 @@ export const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  const imagePath = place.image;
+
   // deleting it
   try {
     const session = await mongoose.startSession();
@@ -199,6 +203,10 @@ export const deletePlace = async (req, res, next) => {
     );
     return next(error);
   }
+
+  unlink(imagePath, err => {
+    console.log(err);
+  })
 
   res.status(200).json({ message: "Deleted place." });
 };
