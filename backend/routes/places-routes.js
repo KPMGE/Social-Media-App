@@ -8,12 +8,14 @@ import {
   deletePlace,
 } from "../controllers/places-controllers.js";
 import fileUpload from "../middleware/file-upload.js";
+import checkAuth from "../middleware/check-auth.js";
 
 const router = express.Router();
 
 router.get("/:placeId", getPlaceById);
-
 router.get("/user/:userId", getPlacesByUserId);
+
+router.use(checkAuth);
 
 router.post(
   "/",
