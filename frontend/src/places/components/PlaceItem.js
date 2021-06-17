@@ -37,7 +37,7 @@ const PlaceItem = (props) => {
         "DELETE",
         null,
         {
-          Authorization: "Bearer" + auth.token,
+          Authorization: "Bearer " + auth.token,
         }
       );
 
@@ -47,7 +47,7 @@ const PlaceItem = (props) => {
 
   return (
     <React.Fragment>
-      <ErrorModal error={error} onclear={clearError} />
+      <ErrorModal error={error} onClear={clearError} />
 
       <Modal
         show={showMap}

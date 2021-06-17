@@ -1,4 +1,4 @@
-import  {unlink} from 'fs';
+import { unlink } from "fs";
 
 import mongoose from "mongoose";
 import { validationResult } from "express-validator";
@@ -146,6 +146,12 @@ export const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // check authorization
+  if (place.creatorId.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 401);
+    return next(error);
+  }
+
   // updating title and description
   place.title = title;
   place.description = description;
@@ -173,7 +179,7 @@ export const deletePlace = async (req, res, next) => {
     place = await Place.findById(placeId).populate("creator");
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong, could not delete place.",
+      "Something went wrong, could not find place to delete.",
       500
     );
     return next(error);
@@ -184,6 +190,20 @@ export const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // check authorization
+
+  if (place.creatorId !== req.userData.userId) {
+    console.log("CreatorId.id: ", place.creatorId);
+    console.log("userData.userId: ", userData.userId);
+    /*
+    const error = new HttpError(
+      "You are not allowed to delete this place.",
+      401
+    );
+    return next(error);
+    */
+  }
+
   const imagePath = place.image;
 
   // deleting it
@@ -191,7 +211,7 @@ export const deletePlace = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    await place.remove({ session });
+    await place.remove({ session: session });
     place.creatorId.places.pull(place);
 
     await place.creatorId.save({ session });
@@ -204,9 +224,9 @@ export const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
-  unlink(imagePath, err => {
+  unlink(imagePath, (err) => {
     console.log(err);
-  })
+  });
 
   res.status(200).json({ message: "Deleted place." });
 };

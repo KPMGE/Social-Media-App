@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -18,18 +18,48 @@ const App = () => {
   const [token, setToken] = useState(false);
   const [userId, setUserId] = useState(false);
 
-  const login = useCallback((userId, token) => {
+  const login = useCallback((userId, token, expirationDate) => {
     setToken(token);
     setUserId(userId);
+
+    const ONE_HOUR = 1000 * 60 * 60;
+    const tokenExpirationDate =
+      expirationDate || Date(new Date.getTime() + ONE_HOUR);
+
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({
+        userId,
+        token,
+        expirationDate: tokenExpirationDate.toISOString(),
+      })
+    );
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setUserId(null);
+    localStorage.removeItem("userData");
   }, []);
 
-  let routes;
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
 
+    const isLoginValid =
+      storedData &&
+      storedData.token &&
+      new Date(storedData.expirationDate) > new Date();
+
+    if (isLoginValid) {
+      login(
+        storedData.userId,
+        storedData.token,
+        new Date(storedData.expirationDate)
+      );
+    }
+  }, [login]);
+
+  let routes;
   if (token) {
     routes = (
       <Switch>
