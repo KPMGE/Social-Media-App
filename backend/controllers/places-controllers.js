@@ -67,7 +67,7 @@ export const createPlace = async (req, res, next) => {
     );
   }
 
-  const { title, description, address, creatorId } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
   try {
@@ -83,12 +83,12 @@ export const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    creatorId,
+    creatorId: req.userData.userId,
   });
 
   let user;
   try {
-    user = await User.findById(creatorId);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError(
       "Creating place failed, please try again.",
@@ -192,16 +192,12 @@ export const deletePlace = async (req, res, next) => {
 
   // check authorization
 
-  if (place.creatorId !== req.userData.userId) {
-    console.log("CreatorId.id: ", place.creatorId);
-    console.log("userData.userId: ", userData.userId);
-    /*
+  if (place.creatorId.toString() !== req.userData.userId) {
     const error = new HttpError(
       "You are not allowed to delete this place.",
       401
     );
     return next(error);
-    */
   }
 
   const imagePath = place.image;
@@ -211,7 +207,7 @@ export const deletePlace = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    await place.remove({ session: session });
+    await place.remove({ session });
     place.creatorId.places.pull(place);
 
     await place.creatorId.save({ session });
@@ -219,7 +215,7 @@ export const deletePlace = async (req, res, next) => {
   } catch (err) {
     const error = new HttpError(
       "Something went wrong, could not delete place.",
-      500
+      499
     );
     return next(error);
   }
